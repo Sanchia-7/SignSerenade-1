@@ -88,7 +88,7 @@ export default function TranslatePage() {
         Translate between sign language and text using our advanced YOLOv3 model for real-time sign detection
       </motion.p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Left Section: Sign Language to Text with YOLO */}
         <motion.div
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
@@ -102,7 +102,7 @@ export default function TranslatePage() {
               <h2 className="text-xl font-bold text-white">Sign Language to Text</h2>
             </div>
             <span className="bg-blue-500/30 text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              YOLOv3 Powered
+              YOLOv11 Powered
             </span>
           </div>
 

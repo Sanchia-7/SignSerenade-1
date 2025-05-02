@@ -14,50 +14,131 @@ interface Detection {
 }
 
 export default function RealTimeSignDetector() {
-  const [captureInterval, setCaptureInterval] = useState(4) // seconds
+  const [captureInterval, setCaptureInterval] = useState(4)
   const [detections, setDetections] = useState<Detection[]>([])
   const [lastDetectedSign, setLastDetectedSign] = useState<string | null>(null)
   const [detectionHistory, setDetectionHistory] = useState<string[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showSettings, setShowSettings] = useState(true)
+  const [holisticLoaded, setHolisticLoaded] = useState(false)
+  const [receiving, setReceiving] = useState(false)
 
-  // Use the same camera hook that works in the YOLO component
-  const { videoRef, canvasRef, isActive, permissionDenied, permissionStatus, toggleCamera, startCamera } = useCamera()
+  const { videoRef, canvasRef, isActive, permissionDenied, toggleCamera, startCamera } = useCamera()
 
+  const holisticRef = useRef<any>(null)
+  const lastDetectionTime = useRef<number>(0)
   const captureTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Start capturing frames at regular intervals
-  const startCaptureInterval = () => {
-    if (captureTimerRef.current) {
-      clearInterval(captureTimerRef.current)
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (canvas) {
+      canvas.width = 640
+      canvas.height = 480
+      const ctx = canvas.getContext("2d")
+      if (ctx) {
+        ctx.fillStyle = "black"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+      }
     }
 
-    console.log(`Setting capture interval to ${captureInterval} seconds`)
+    const interval = setInterval(() => {
+      const now = Date.now()
+      setReceiving(now - lastDetectionTime.current < 1000)
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const loadScript = (src: string) =>
+    new Promise<void>((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) return resolve()
+      const script = document.createElement("script")
+      script.src = src
+      script.crossOrigin = "anonymous"
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error(`Failed to load ${src}`))
+      document.head.appendChild(script)
+    })
+
+  const loadAndInitHolistic = async () => {
+    try {
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js")
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js")
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js")
+
+      const win = window as any
+      const { Holistic, drawConnectors, drawLandmarks } = win
+      if (!Holistic || !drawConnectors || !drawLandmarks) throw new Error("MediaPipe modules failed to load")
+
+      const holistic = new Holistic({
+        locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+      })
+
+      holistic.setOptions({
+        modelComplexity: 0, // Reduce model complexity for better performance
+        smoothLandmarks: true,
+        refineFaceLandmarks: false, // Disable refineFaceLandmarks for speed
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      })
+
+      holistic.onResults((results: any) => {
+        const ctx = canvasRef.current?.getContext("2d")
+        if (!ctx) return
+
+        lastDetectionTime.current = Date.now()
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.fillStyle = "black"
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+        const draw = (landmarks: any, color: string, radius = 1, width = 1) => {
+          drawLandmarks(ctx, landmarks, { color, lineWidth: width, radius })
+        }
+
+        const connect = (landmarks: any, connections: any, color: string, width = 1) => {
+          drawConnectors(ctx, landmarks, connections, { color, lineWidth: width })
+        }
+
+        if (results.faceLandmarks) {
+          connect(results.faceLandmarks, win.FACEMESH_TESSELATION, "#8B2683", 1)
+          draw(results.faceLandmarks, "#FDEFD1", 1, 1)
+        }
+
+        const hands = [
+          { data: results.leftHandLandmarks, label: "Left" },
+          { data: results.rightHandLandmarks, label: "Right" },
+        ]
+
+        for (const hand of hands) {
+          if (hand.data) {
+            connect(hand.data, win.HAND_CONNECTIONS, "#0000ED", 2)
+            draw(hand.data, "#00FE00", 3, 2)
+          }
+        }
+      })
+
+      holisticRef.current = holistic
+      setHolisticLoaded(true)
+    } catch (err) {
+      console.error("Holistic loading error:", err)
+    }
+  }
+
+  const startCaptureInterval = () => {
+    if (captureTimerRef.current) clearInterval(captureTimerRef.current)
     captureTimerRef.current = setInterval(() => {
       captureAndDetect()
     }, captureInterval * 1000)
   }
 
-  // Update capture interval
   const updateCaptureInterval = (newInterval: number) => {
     setCaptureInterval(newInterval)
-    if (isActive) {
-      startCaptureInterval()
-    }
+    if (isActive) startCaptureInterval()
   }
 
-  // Capture frame and send for detection
   const captureAndDetect = async () => {
-    if (!isActive || !videoRef.current || !canvasRef.current || isProcessing) {
-      console.log("Cannot capture: ", {
-        isActive,
-        hasVideoRef: !!videoRef.current,
-        hasCanvasRef: !!canvasRef.current,
-        isProcessing,
-      })
-      return
-    }
+    if (!isActive || !videoRef.current || !canvasRef.current || isProcessing) return
 
     setIsProcessing(true)
     setError(null)
@@ -66,92 +147,54 @@ export default function RealTimeSignDetector() {
       const video = videoRef.current
       const canvas = canvasRef.current
       const context = canvas.getContext("2d")
+      if (!context) throw new Error("Could not get canvas context")
 
-      if (!context) {
-        setError("Could not get canvas context")
-        setIsProcessing(false)
-        return
-      }
-
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth || 640
       canvas.height = video.videoHeight || 480
-
-      // Draw the current frame to the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height)
-      console.log(`Captured frame: ${canvas.width}x${canvas.height}`)
 
-      // Convert canvas to blob
-      canvas.toBlob(
-        async (blob) => {
-          if (!blob) {
-            setError("Failed to create image blob")
-            setIsProcessing(false)
-            return
-          }
+      if (holisticLoaded && holisticRef.current && videoRef.current) {
+        await holisticRef.current.send({ image: videoRef.current })
+      }
 
-          try {
-            console.log(`Sending blob to backend (size: ${blob.size} bytes)`)
-            // Send to backend for detection
-            const formData = new FormData()
-            formData.append("image", blob, "capture.jpg")
+      canvas.toBlob(async (blob) => {
+        if (!blob) throw new Error("Failed to create image blob")
 
-            const response = await fetch(`${API_CONFIG.baseUrl}/detect`, {
-              method: "POST",
-              body: formData,
-            })
+        const formData = new FormData()
+        formData.append("image", blob, "capture.jpg")
 
-            if (!response.ok) {
-              throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+        const response = await fetch(`${API_CONFIG.baseUrl}/detect`, {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+
+        const data = await response.json()
+        if (data.success && data.detections?.length > 0) {
+          const sortedDetections = [...data.detections].sort((a, b) => b.confidence - a.confidence)
+          setDetections(sortedDetections)
+          const topDetection = sortedDetections[0]
+          setLastDetectedSign(topDetection.class_name)
+
+          setDetectionHistory((prev) => {
+            if (prev.length === 0 || prev[prev.length - 1] !== topDetection.class_name) {
+              const newHistory = [...prev, topDetection.class_name]
+              return newHistory.length > 10 ? newHistory.slice(-10) : newHistory
             }
-
-            const data = await response.json()
-            console.log("Detection response:", data)
-
-            if (data.success && data.detections && data.detections.length > 0) {
-              // Sort by confidence (highest first)
-              const sortedDetections = [...data.detections].sort((a, b) => b.confidence - a.confidence)
-              setDetections(sortedDetections)
-
-              // Get the highest confidence detection
-              const topDetection = sortedDetections[0]
-              setLastDetectedSign(topDetection.class_name)
-
-              // Add to history if it's different from the last one
-              setDetectionHistory((prev) => {
-                // Only add if it's different from the last one
-                if (prev.length === 0 || prev[prev.length - 1] !== topDetection.class_name) {
-                  // Keep only the last 10 detections
-                  const newHistory = [...prev, topDetection.class_name]
-                  if (newHistory.length > 10) {
-                    return newHistory.slice(-10)
-                  }
-                  return newHistory
-                }
-                return prev
-              })
-            } else {
-              // No detections
-              setDetections([])
-            }
-          } catch (error) {
-            console.error("Error detecting signs:", error)
-            setError(`Detection failed: ${error instanceof Error ? error.message : String(error)}`)
-          } finally {
-            setIsProcessing(false)
-          }
-        },
-        "image/jpeg",
-        0.9,
-      )
-    } catch (error) {
-      console.error("Error capturing frame:", error)
-      setError(`Capture failed: ${error instanceof Error ? error.message : String(error)}`)
+            return prev
+          })
+        } else {
+          setDetections([])
+        }
+      }, "image/jpeg", 0.9)
+    } catch (err: any) {
+      setError(`Capture failed: ${err.message || err}`)
+    } finally {
       setIsProcessing(false)
     }
   }
 
-  // Start/stop capture interval when camera state changes
   useEffect(() => {
     if (isActive) {
       startCaptureInterval()
@@ -159,7 +202,6 @@ export default function RealTimeSignDetector() {
       clearInterval(captureTimerRef.current)
       captureTimerRef.current = null
     }
-
     return () => {
       if (captureTimerRef.current) {
         clearInterval(captureTimerRef.current)
@@ -168,18 +210,15 @@ export default function RealTimeSignDetector() {
     }
   }, [isActive])
 
-  // Handle camera toggle with additional logic
   const handleToggleCamera = async () => {
     if (isActive) {
       toggleCamera()
       return
     }
-
     const success = await startCamera()
     if (success) {
-      console.log("Camera started successfully")
+      await loadAndInitHolistic()
     } else {
-      console.error("Failed to start camera")
       setError("Failed to start camera. Please check permissions and try again.")
     }
   }
@@ -196,15 +235,7 @@ export default function RealTimeSignDetector() {
                 isActive ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
-              {isActive ? (
-                <>
-                  <Pause className="w-5 h-5" /> Stop
-                </>
-              ) : (
-                <>
-                  <Play className="w-5 h-5" /> Start
-                </>
-              )}
+              {isActive ? <><Pause className="w-5 h-5" /> Stop</> : <><Play className="w-5 h-5" /> Start</>}
             </button>
             <button
               onClick={() => setShowSettings(!showSettings)}
@@ -217,12 +248,7 @@ export default function RealTimeSignDetector() {
         </div>
 
         {showSettings && (
-          <motion.div
-            className="mb-4 p-4 bg-gray-100 rounded-lg"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-          >
+          <motion.div className="mb-4 p-4 bg-gray-100 rounded-lg">
             <h3 className="font-medium mb-2">Detection Settings</h3>
             <div className="flex items-center gap-4">
               <div>
@@ -236,7 +262,7 @@ export default function RealTimeSignDetector() {
                   max="10"
                   step="1"
                   value={captureInterval}
-                  onChange={(e) => updateCaptureInterval(Number.parseInt(e.target.value))}
+                  onChange={(e) => updateCaptureInterval(Number(e.target.value))}
                   className="w-full"
                 />
                 <div className="text-center text-sm">{captureInterval}s</div>
@@ -274,7 +300,7 @@ export default function RealTimeSignDetector() {
               {isActive ? (
                 <>
                   <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
-                  <canvas ref={canvasRef} className="hidden" />
+                  <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
                   {isProcessing && (
                     <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
                       Processing...
@@ -298,6 +324,10 @@ export default function RealTimeSignDetector() {
                 </div>
               )}
             </div>
+
+            {isActive && receiving && (
+              <div className="mt-2 text-sm text-green-600 text-center">✅ Holistic detection active</div>
+            )}
 
             {lastDetectedSign && (
               <motion.div

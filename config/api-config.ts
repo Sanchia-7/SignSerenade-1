@@ -1,12 +1,12 @@
 export const SIGN_ACTIONS = [
   "0", "1", "2", "3",
-  "4", "5", "6", "7", "8", "9", "a", 
-  "after", "again", "against", "age", 
-  "all", "alone", "aLone", "also", 
-  "and", "are", "ask", "at", "b", 
-  "be", "beautiful", "before", "best", 
+  "4", "5", "6", "7", "8", "9", "a",
+  "after", "again", "against", "age",
+  "all", "alone", "aLone", "also",
+  "and", "are", "ask", "at", "b",
+  "be", "beautiful", "before", "best",
   "better", "busy", "but", "bye", "c",
-  "can", "cannot", "change", "college", 
+  "can", "cannot", "change", "college",
   "come", "computer", "d", "day", "distance",
   "do", "do not", "does not", "e", "eat", "engineer",
   "f", "fight", "finish", "from", "g", "glitter",
@@ -30,7 +30,7 @@ export const SIGN_ACTIONS = [
   "yourself", "z"
 ]
 
-  
+
 // Configuration for connecting to the Python backend
 const getApiBaseUrl = () => {
   // First check localStorage for a custom URL (allows user configuration)

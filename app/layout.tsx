@@ -42,11 +42,11 @@ export default function RootLayout({
           <Navbar />
           <main className="pt-16">
             {children}
-            <CameraDebug />
+            {/* <CameraDebug />
             <BackendDebug />
             <BackendConnectionChecker />
             <DetectionDebugger />
-            <MediaPipeDiagnostics />
+            <MediaPipeDiagnostics /> */}
           </main>
         </ModalProvider>
       </body>

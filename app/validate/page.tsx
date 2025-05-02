@@ -16,12 +16,14 @@ export default function ValidatePage() {
   const [availableSigns, setAvailableSigns] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const captureTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const {
     videoRef: cameraVideoRef,
     canvasRef,
     isActive: cameraActive,
     detectedAction,
+    // setDetectedAction, (removed as it does not exist in useCamera)
     permissionDenied,
     permissionStatus,
     toggleCamera,
@@ -31,7 +33,6 @@ export default function ValidatePage() {
 
   const { showCameraPermission } = useModal()
 
-  // Load available signs
   useEffect(() => {
     async function loadAvailableSigns() {
       try {
@@ -47,7 +48,6 @@ export default function ValidatePage() {
     loadAvailableSigns()
   }, [])
 
-  // Handle sign selection
   const handleSignSelection = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -70,13 +70,50 @@ export default function ValidatePage() {
     }
   }
 
-  // Handle video error
   const handleVideoError = () => {
     console.error("Error loading video:", referenceVideo)
     setVideoError(true)
   }
 
-  // Toggle camera for validation
+  const captureAndDetect = async () => {
+    if (!cameraVideoRef.current || !canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const context = canvas.getContext("2d")
+    if (!context) return
+
+    canvas.width = cameraVideoRef.current.videoWidth || 640
+    canvas.height = cameraVideoRef.current.videoHeight || 480
+    context.drawImage(cameraVideoRef.current, 0, 0, canvas.width, canvas.height)
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return
+
+      const formData = new FormData()
+      formData.append("image", blob, "capture.jpg")
+
+      try {
+        const response = await fetch("/api/detect", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) throw new Error(`Server returned ${response.status}`)
+
+        const data = await response.json()
+        if (data.success && data.detections?.length > 0) {
+          const topDetection = data.detections.sort((a: any, b: any) => b.confidence - a.confidence)[0]
+          setDetectedAction(topDetection.class_name)
+        } else {
+          setDetectedAction("Waiting...")
+        }
+      } catch (err) {
+        console.error("Detection error:", err)
+        setDetectedAction("Waiting...")
+      }
+    }, "image/jpeg", 0.9)
+  }
+
   const handleToggleCamera = async () => {
     if (!selectedSign) {
       alert("Please select a sign to validate first!")
@@ -84,37 +121,27 @@ export default function ValidatePage() {
     }
 
     if (cameraActive) {
-      // If camera is already active, just turn it off
       toggleCamera()
+      if (captureTimerRef.current) clearInterval(captureTimerRef.current)
       return
     }
 
-    // If permission is already granted, start camera directly
     if (permissionStatus === "granted") {
-      console.log("Permission already granted, starting camera directly")
-      // Ensure the video ref is ready before starting the camera
       setTimeout(async () => {
-        const success = await startCamera(true) // Skip permission check
+        const success = await startCamera(true)
         if (success) {
-          startDetection(3000)
-        } else {
-          console.error("Failed to start camera even though permission was granted")
+          captureTimerRef.current = setInterval(() => captureAndDetect(), 3000)
         }
       }, 100)
       return
     }
 
-    // If permission is unknown or denied, show permission UI
     showCameraPermission({
       onPermissionGranted: async () => {
-        console.log("Permission granted, starting camera")
-        // Add a small delay to ensure DOM elements are ready
         setTimeout(async () => {
-          const success = await startCamera(true) // Skip permission check since we just got permission
+          const success = await startCamera(true)
           if (success) {
-            startDetection(3000)
-          } else {
-            console.error("Failed to start camera after permission was granted")
+            captureTimerRef.current = setInterval(() => captureAndDetect(), 3000)
           }
         }, 100)
       },
@@ -124,19 +151,16 @@ export default function ValidatePage() {
     })
   }
 
-  // Check if detected action matches selected sign
   const validateAction = () => {
     if (!selectedSign || detectedAction === "Waiting...") return null
-
     return detectedAction.toLowerCase() === selectedSign.toLowerCase()
   }
 
-  // Update validation result when detected action changes
-  useState(() => {
+  useEffect(() => {
     if (cameraActive && selectedSign && detectedAction !== "Waiting...") {
       setValidationResult(validateAction())
     }
-  })
+  }, [cameraActive, selectedSign, detectedAction])
 
   return (
     <div className="container mx-auto px-4 py-8">
