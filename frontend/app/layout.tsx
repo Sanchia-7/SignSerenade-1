@@ -43,10 +43,10 @@ export default function RootLayout({
           <main className="pt-16">
             {children}
             {/* <CameraDebug /> */}
-            <BackendDebug />
-            <BackendConnectionChecker />
+            {/* <BackendDebug />
+            <BackendConnectionChecker /> */}
             <DetectionDebugger />
-            <MediaPipeDiagnostics />
+            {/* <MediaPipeDiagnostics /> */}
           </main>
         </ModalProvider>
       </body>

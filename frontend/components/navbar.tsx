@@ -1,52 +1,206 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion } from "framer-motion"
-import { Home, Info, Users, Languages, BookOpen, Scan, Fingerprint, Camera } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Home, Info, Users, Languages, BookOpen, Scan, Settings, Fingerprint, Menu, X, Hand } from "lucide-react"
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
+
+  // Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "unset"
+    }
+    return () => {
+      document.body.style.overflow = "unset"
+    }
+  }, [isOpen])
 
   const links = [
-    { href: "/", label: "Home", icon: <Home className="w-4 h-4 mr-2" /> },
-    { href: "/about", label: "About Us", icon: <Info className="w-4 h-4 mr-2" /> },
-    { href: "/team", label: "Meet the Team", icon: <Users className="w-4 h-4 mr-2" /> },
-    { href: "/translate", label: "Translate", icon: <Languages className="w-4 h-4 mr-2" /> },
-    { href: "/learn", label: "Learning Platform", icon: <BookOpen className="w-4 h-4 mr-2" /> },
-    { href: "/landmark-detection", label: "Landmark Detection", icon: <Fingerprint className="w-4 h-4 mr-2" /> },
-  { href: "/real-time", label: "Real-Time", icon: <Camera className="w-4 h-4 mr-2" /> },
-    // { href: "/settings", label: "Settings", icon: <Settings className="w-4 h-4 mr-2" /> },
+    // { href: "/", label: "Home", icon: <Home className="w-5 h-5" /> },
+    { href: "/about", label: "About Us", icon: <Info className="w-5 h-5" /> },
+    { href: "/team", label: "Meet the Team", icon: <Users className="w-5 h-5" /> },
+    { href: "/translate", label: "Translate", icon: <Languages className="w-5 h-5" /> },
+    { href: "/learn", label: "Learning Platform", icon: <BookOpen className="w-5 h-5" /> },
+    // { href: "/real-time", label: "Real-time", icon: <Scan className="w-5 h-5" /> },
+    // { href: "/landmark-detection", label: "Landmark Detection", icon: <Fingerprint className="w-5 h-5" /> },
   ]
 
   return (
-    <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 shadow-md"
-      style={{ background: "linear-gradient(to right, #4a628a, #223454)" }}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="flex justify-center items-center px-4 py-3">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`flex items-center px-4 py-2 mx-1 rounded-md transition-colors duration-200
-              ${pathname === link.href ? "bg-[#4a628a] text-white" : "text-black hover:bg-[#4a628a] hover:text-white"}`}
+    <>
+      <motion.nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "bg-gray/50 backdrop-blur-md shadow-md" : "bg-transparent"
+        }`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2 z-10">
+              <div className="relative flex items-center">
+                <div className="p-2 rounded-full">
+                  <Hand className={`w-6 h-6 text-white ${scrolled ? "text-white": "text-gray-900"}`}/>
+                </div>
+                <motion.div
+                  className={`ml-3 font-bold text-xl ${scrolled ? "text-white": "text-gray-900"}`}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  SignSerenade
+                </motion.div>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-1">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative
+                    ${
+                      pathname === link.href
+                        ? scrolled
+                          ? "text-blue-700 bg-blue-50"
+                          : "text-white bg-blue-700/30"
+                        : scrolled
+                          ? "text-gray-700 hover:bg-gray-100"
+                          : "text-gray-200 hover:bg-white/10"
+                    }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {link.icon}
+                    {link.label}
+                  </span>
+                  {pathname === link.href && (
+                    <motion.div
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 ${scrolled ? "bg-blue-600" : "bg-white"}`}
+                      layoutId="navbar-underline"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`inline-flex items-center justify-center p-2 rounded-full ${
+                  scrolled ? "text-blue-700 hover:bg-blue-50" : "text-white hover:bg-white/10"
+                } transition-colors duration-200`}
+                aria-expanded={isOpen}
+                aria-label="Toggle menu"
+              >
+                <span className="sr-only">Open main menu</span>
+                <AnimatePresence mode="wait" initial={false}>
+                  {isOpen ? (
+                    <motion.div
+                      key="close"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <X className="block h-6 w-6" aria-hidden="true" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="menu"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Menu className="block h-6 w-6" aria-hidden="true" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed inset-0 z-40 md:hidden bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile menu panel */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed top-16 right-0 bottom-0 z-40 w-full max-w-xs bg-white shadow-xl md:hidden overflow-y-auto"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            {link.icon}
-            <span>{link.label}</span>
-            {pathname === link.href && (
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
-                layoutId="navbar-underline"
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              />
-            )}
-          </Link>
-        ))}
-      </div>
-    </motion.nav>
+            <div className="px-2 pt-4 pb-3 space-y-1 sm:px-3">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center px-4 py-3 rounded-lg text-base font-medium ${
+                    pathname === link.href ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"
+                  } transition-colors duration-200`}
+                >
+                  <div className={`p-2 rounded-full mr-3 ${pathname === link.href ? "bg-blue-100" : "bg-gray-100"}`}>
+                    {link.icon}
+                  </div>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <div className="border-t border-gray-200 pt-4 pb-6 px-5">
+              <div className="flex items-center">
+                <div className="bg-blue-600 p-2 rounded-full">
+                  <Hand className="w-5 h-5 text-white" />
+                </div>
+                <div className="ml-3 text-base font-medium text-gray-800">SignSerenade</div>
+              </div>
+              <div className="mt-6 text-center text-sm text-gray-500">
+                &copy; {new Date().getFullYear()} SignSerenade. All rights reserved.
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

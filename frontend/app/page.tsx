@@ -77,7 +77,6 @@ export default function Home() {
           muted
           loop
           playsInline
-          poster="/placeholder.svg?height=1080&width=1920"
         >
           <source
             src="/signs/Hello.mp4"
@@ -213,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* About Project Section */}
-      <section className="w-full py-20 px-4 bg-gradient-to-b from-gray-100 to-white">
+      {/* <section className="w-full py-20 px-4 bg-gradient-to-b from-gray-100 to-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -233,7 +232,6 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Importance of Sign Language */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -269,7 +267,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Project Goals */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -292,7 +289,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Technology */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -329,7 +325,7 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* American Sign Language Section */}
       <section className="w-full py-20 px-4 bg-gradient-to-r from-blue-50 to-purple-50">
@@ -450,7 +446,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ASL Facts Section */}
+      {/* ASL Alphabet Section */}
       <section className="w-full py-20 px-4 bg-white">
       <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl border border-gray-100">
                 <h3 className="text-4xl font-semibold mb-6 text-center text-gray-800">ASL Alphabet</h3>
@@ -585,7 +581,7 @@ export default function Home() {
       </section>
 
       {/* Interactive ASL Demo Section */}
-      <section className="w-full py-20 px-4 bg-gradient-to-br from-blue-900 to-purple-900 text-white">
+      {/* <section className="w-full py-20 px-4 bg-gradient-to-br from-blue-900 to-purple-900 text-white">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -794,7 +790,7 @@ export default function Home() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Call to Action */}
       <section className="w-full py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
