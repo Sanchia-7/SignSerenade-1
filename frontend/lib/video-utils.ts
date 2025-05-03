@@ -14,11 +14,11 @@ const VIDEO_MAPPING: Record<string, string> = {
   "7": "/signs/7.mp4",
   "8": "/signs/8.mp4",
   "9": "/signs/9.mp4",
-  A: "/signs/A.mp4",
-  After: "/signs/After.mp4",
-  Again: "/signs/Again.mp4",
-  Against: "/signs/Against.mp4",
-  Age: "/signs/Age.mp4",
+  A: "/signs/a.mp4",
+  After: "/signs/after.mp4",
+  Again: "/signs/again.mp4",
+  Against: "/signs/against.mp4",
+  Age: "/signs/age.mp4",
   All: "/signs/All.mp4",
   Alone: "/signs/ALone.mp4",
   Also: "/signs/Also.mp4",
@@ -166,7 +166,7 @@ const VIDEO_MAPPING: Record<string, string> = {
 
 // Initialize the video mapping from the SIGN_ACTIONS array
 SIGN_ACTIONS.forEach((action) => {
-  VIDEO_MAPPING[action.toLowerCase()] = `${action.charAt(0).toUpperCase() + action.slice(1)}.mp4`
+  VIDEO_MAPPING[action.toLowerCase()] = `${action.toLowerCase()}.mp4`
 })
 
 // Add common synonyms and variations
@@ -225,7 +225,7 @@ const SYNONYMS: Record<string, string> = {
   engineering: "engineer",
   f: "f",
   fighting: "fight",
-  finished: "finish",
+  finish: "finish",
   from: "from",
   g: "g",
   glitter: "glitter",
@@ -341,17 +341,16 @@ const SYNONYMS: Record<string, string> = {
  */
 export function getSignVideoPath(word: string): string | null {
   // Clean the word (lowercase, remove punctuation)
-  const cleanWord = word.replace(/[^\w\s]/g, "")
-  const capitalizedWord = cleanWord.charAt(0).toUpperCase() + cleanWord.slice(1)
+  const cleanWord = word.toLowerCase().replace(/[^\w\s]/g, "")
 
-  // Direct mapping
-  if (VIDEO_MAPPING[capitalizedWord]) {
-    return `/signs/${VIDEO_MAPPING[capitalizedWord]}`
+  // Check if we have a direct mapping
+  if (VIDEO_MAPPING[cleanWord]) {
+    return `/signs/${VIDEO_MAPPING[cleanWord]}`
   }
 
-  // Synonym mapping
-  if (SYNONYMS[capitalizedWord] && VIDEO_MAPPING[SYNONYMS[capitalizedWord]]) {
-    return `/signs/${VIDEO_MAPPING[SYNONYMS[capitalizedWord]]}`
+  // Check if we have a synonym mapping
+  if (SYNONYMS[cleanWord] && VIDEO_MAPPING[SYNONYMS[cleanWord]]) {
+    return `/signs/${VIDEO_MAPPING[SYNONYMS[cleanWord]]}`
   }
 
   // No video found
@@ -395,7 +394,7 @@ export async function getAvailableSignVideos(): Promise<string[]> {
   const availableVideos: string[] = []
 
   for (const action of SIGN_ACTIONS) {
-    const path = `/signs/${action.charAt(0).toUpperCase() + action.slice(1)}.mp4`
+    const path = `/signs/${action.toLowerCase()}.mp4`
     if (await checkVideoExists(path)) {
       availableVideos.push(action)
     }
