@@ -166,7 +166,7 @@ const VIDEO_MAPPING: Record<string, string> = {
 
 // Initialize the video mapping from the SIGN_ACTIONS array
 SIGN_ACTIONS.forEach((action) => {
-  VIDEO_MAPPING[action.toLowerCase()] = `${action.toLowerCase()}.mp4`
+  VIDEO_MAPPING[action.toLowerCase()] = `${action.charAt(0).toUpperCase() + action.slice(1)}.mp4`
 })
 
 // Add common synonyms and variations
@@ -341,16 +341,17 @@ const SYNONYMS: Record<string, string> = {
  */
 export function getSignVideoPath(word: string): string | null {
   // Clean the word (lowercase, remove punctuation)
-  const cleanWord = word.toLowerCase().replace(/[^\w\s]/g, "")
+  const cleanWord = word.replace(/[^\w\s]/g, "")
+  const capitalizedWord = cleanWord.charAt(0).toUpperCase() + cleanWord.slice(1)
 
-  // Check if we have a direct mapping
-  if (VIDEO_MAPPING[cleanWord]) {
-    return `/signs/${VIDEO_MAPPING[cleanWord]}`
+  // Direct mapping
+  if (VIDEO_MAPPING[capitalizedWord]) {
+    return `/signs/${VIDEO_MAPPING[capitalizedWord]}`
   }
 
-  // Check if we have a synonym mapping
-  if (SYNONYMS[cleanWord] && VIDEO_MAPPING[SYNONYMS[cleanWord]]) {
-    return `/signs/${VIDEO_MAPPING[SYNONYMS[cleanWord]]}`
+  // Synonym mapping
+  if (SYNONYMS[capitalizedWord] && VIDEO_MAPPING[SYNONYMS[capitalizedWord]]) {
+    return `/signs/${VIDEO_MAPPING[SYNONYMS[capitalizedWord]]}`
   }
 
   // No video found
@@ -394,7 +395,7 @@ export async function getAvailableSignVideos(): Promise<string[]> {
   const availableVideos: string[] = []
 
   for (const action of SIGN_ACTIONS) {
-    const path = `/signs/${action.toLowerCase()}.mp4`
+    const path = `/signs/${action.charAt(0).toUpperCase() + action.slice(1)}.mp4`
     if (await checkVideoExists(path)) {
       availableVideos.push(action)
     }
