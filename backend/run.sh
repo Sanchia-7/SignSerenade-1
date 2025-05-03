@@ -2,7 +2,7 @@
 # Script to run the Flask backend on port 8000
 
 # Set the model path environment variable
-export MODEL_PATH=model.pt
+export MODEL_PATH=best.pt
 # Set the port
 export PORT=8000
 

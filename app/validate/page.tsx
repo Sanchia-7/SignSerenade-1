@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useRef, type FormEvent, useEffect } from "react"
+import { useState, useRef, useEffect, type FormEvent } from "react"
 import { motion } from "framer-motion"
 import { Camera, Check, AlertCircle, Info } from "lucide-react"
-import { useCamera } from "@/hooks/use-camera"
 import { validateSign } from "@/lib/api-client"
 import { useModal } from "@/context/modal-context"
-import { SIGN_ACTIONS } from "@/config/api-config"
+import { SIGN_ACTIONS, API_CONFIG } from "@/config/api-config"
+import { useCamera } from "@/hooks/use-camera"
 
 export default function ValidatePage() {
   const [selectedSign, setSelectedSign] = useState("")
@@ -16,19 +16,25 @@ export default function ValidatePage() {
   const [availableSigns, setAvailableSigns] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  const [captureInterval, setCaptureInterval] = useState(4)
+  const [detections, setDetections] = useState<any[]>([])
+  const [lastDetectedSign, setLastDetectedSign] = useState<string | null>(null)
+  const [detectionHistory, setDetectionHistory] = useState<string[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [holisticLoaded, setHolisticLoaded] = useState(false)
+  const holisticRef = useRef<any>(null)
+  const lastDetectionTime = useRef<number>(0)
   const captureTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const {
     videoRef: cameraVideoRef,
     canvasRef,
     isActive: cameraActive,
-    detectedAction,
-    // setDetectedAction, (removed as it does not exist in useCamera)
     permissionDenied,
     permissionStatus,
     toggleCamera,
     startCamera,
-    startDetection,
   } = useCamera()
 
   const { showCameraPermission } = useModal()
@@ -38,163 +44,190 @@ export default function ValidatePage() {
       try {
         const response = await fetch("/api/available-signs")
         const data = await response.json()
-        setAvailableSigns(data.signs || SIGN_ACTIONS)
+        setAvailableSigns([...new Set(data.signs || SIGN_ACTIONS)])
       } catch (error) {
-        console.error("Error loading available signs:", error)
-        setAvailableSigns(SIGN_ACTIONS)
+        setAvailableSigns([...new Set(SIGN_ACTIONS)])
       }
     }
-
     loadAvailableSigns()
   }, [])
 
   const handleSignSelection = async (e: FormEvent) => {
     e.preventDefault()
-
     if (inputRef.current && inputRef.current.value.trim()) {
       const sign = inputRef.current.value.trim()
       setSelectedSign(sign)
       setVideoError(false)
-
       try {
         const videos = await validateSign(sign)
-        if (videos.length > 0) {
-          setReferenceVideo(videos[0])
-        } else {
-          setVideoError(true)
-        }
-      } catch (error) {
-        console.error("Error validating sign:", error)
+        setReferenceVideo(videos[0] || "")
+        setVideoError(videos.length === 0)
+      } catch {
         setVideoError(true)
       }
     }
   }
 
   const handleVideoError = () => {
-    console.error("Error loading video:", referenceVideo)
     setVideoError(true)
   }
 
-  const captureAndDetect = async () => {
-    if (!cameraVideoRef.current || !canvasRef.current) return
-
-    const canvas = canvasRef.current
-    const context = canvas.getContext("2d")
-    if (!context) return
-
-    canvas.width = cameraVideoRef.current.videoWidth || 640
-    canvas.height = cameraVideoRef.current.videoHeight || 480
-
-    // Draw a black screen
-    context.fillStyle = "black"
-    context.fillRect(0, 0, canvas.width, canvas.height)
-
-    // Use MediaPipe Holistic for landmark detection
-    const holistic = new window.Holistic({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+  const loadScript = (src: string) =>
+    new Promise<void>((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) return resolve()
+      const script = document.createElement("script")
+      script.src = src
+      script.crossOrigin = "anonymous"
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error(`Failed to load ${src}`))
+      document.head.appendChild(script)
     })
 
-    holistic.setOptions({
-      modelComplexity: 1,
-      smoothLandmarks: true,
-      enableSegmentation: true,
-      smoothSegmentation: true,
-      refineFaceLandmarks: true,
-    })
+  const loadAndInitHolistic = async () => {
+    try {
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js")
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js")
+      await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js")
 
-    holistic.onResults((results) => {
-      if (results.poseLandmarks) {
-        drawLandmarks(context, results.poseLandmarks, { color: "white", lineWidth: 2 })
-      }
-      if (results.faceLandmarks) {
-        drawLandmarks(context, results.faceLandmarks, { color: "cyan", lineWidth: 1 })
-      }
-      if (results.leftHandLandmarks) {
-        drawLandmarks(context, results.leftHandLandmarks, { color: "green", lineWidth: 2 })
-      }
-      if (results.rightHandLandmarks) {
-        drawLandmarks(context, results.rightHandLandmarks, { color: "red", lineWidth: 2 })
-      }
-    })
+      const win = window as any
+      const { Holistic, drawConnectors, drawLandmarks } = win
+      const holistic = new Holistic({ locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}` })
 
-    holistic.send({ image: cameraVideoRef.current })
+      holistic.setOptions({ modelComplexity: 0, smoothLandmarks: true, refineFaceLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 })
 
-    // Send the real-time image to the backend
-    canvas.toBlob(async (blob) => {
-      if (!blob) return
+      holistic.onResults((results: any) => {
+        const ctx = canvasRef.current?.getContext("2d")
+        if (!ctx) return
 
-      const formData = new FormData()
-      formData.append("image", blob, "capture.jpg")
+        lastDetectionTime.current = Date.now()
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.fillStyle = "black"
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-      try {
-        const response = await fetch("/api/detect", {
-          method: "POST",
-          body: formData,
-        })
-
-        if (!response.ok) throw new Error(`Server returned ${response.status}`)
-
-        const data = await response.json()
-        if (data.success && data.detections?.length > 0) {
-          const topDetection = data.detections.sort((a: any, b: any) => b.confidence - a.confidence)[0]
-          setDetectedAction(topDetection.class_name)
-        } else {
-          setDetectedAction("Waiting...")
+        const draw = (landmarks: any, color: string, radius = 1, width = 1) => {
+          drawLandmarks(ctx, landmarks, { color, lineWidth: width, radius })
         }
-      } catch (err) {
-        console.error("Detection error:", err)
-        setDetectedAction("Waiting...")
-      }
-    }, "image/jpeg", 0.9)
-  }
 
-  const handleToggleCamera = async () => {
-    if (!selectedSign) {
-      alert("Please select a sign to validate first!")
-      return
-    }
-
-    if (cameraActive) {
-      toggleCamera()
-      if (captureTimerRef.current) clearInterval(captureTimerRef.current)
-      return
-    }
-
-    if (permissionStatus === "granted") {
-      setTimeout(async () => {
-        const success = await startCamera(true)
-        if (success) {
-          captureTimerRef.current = setInterval(() => captureAndDetect(), 3000)
+        const connect = (landmarks: any, connections: any, color: string, width = 1) => {
+          drawConnectors(ctx, landmarks, connections, { color, lineWidth: width })
         }
-      }, 100)
-      return
-    }
 
-    showCameraPermission({
-      onPermissionGranted: async () => {
-        setTimeout(async () => {
-          const success = await startCamera(true)
-          if (success) {
-            captureTimerRef.current = setInterval(() => captureAndDetect(), 3000)
+        if (results.faceLandmarks) {
+          connect(results.faceLandmarks, win.FACEMESH_TESSELATION, "#8B2683", 1)
+          draw(results.faceLandmarks, "#FDEFD1", 1, 1)
+        }
+
+        const hands = [
+          { data: results.leftHandLandmarks, label: "Left" },
+          { data: results.rightHandLandmarks, label: "Right" },
+        ]
+
+        for (const hand of hands) {
+          if (hand.data) {
+            connect(hand.data, win.HAND_CONNECTIONS, "#0000ED", 2)
+            draw(hand.data, "#00FE00", 3, 2)
           }
-        }, 100)
-      },
-      onPermissionDenied: () => {
-        console.log("Permission denied")
-      },
-    })
-  }
+        }
+      })
 
-  const validateAction = () => {
-    if (!selectedSign || detectedAction === "Waiting...") return null
-    return detectedAction.toLowerCase() === selectedSign.toLowerCase()
+      holisticRef.current = holistic
+      setHolisticLoaded(true)
+    } catch (err) {
+      console.error("Holistic loading error:", err)
+    }
   }
 
   useEffect(() => {
-    if (cameraActive && selectedSign && detectedAction !== "Waiting...") {
-      setValidationResult(validateAction())
+    loadAndInitHolistic()
+  }, [])
+
+  const captureAndDetect = async () => {
+    if (!cameraActive || !cameraVideoRef.current || !canvasRef.current || isProcessing) return
+    setIsProcessing(true)
+    try {
+      const video = cameraVideoRef.current
+      const canvas = canvasRef.current
+      const context = canvas.getContext("2d")
+      if (!context) return
+
+      canvas.width = video.videoWidth || 640
+      canvas.height = video.videoHeight || 480
+      context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+      if (holisticLoaded && holisticRef.current && video) {
+        await holisticRef.current.send({ image: video })
+      }
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return
+        const formData = new FormData()
+        formData.append("image", blob, "capture.jpg")
+        const res = await fetch(`${API_CONFIG.baseUrl}/detect`, { method: "POST", body: formData })
+        const data = await res.json()
+        if (data.success && data.detections?.length > 0) {
+          const sorted = [...data.detections].sort((a, b) => b.confidence - a.confidence)
+          setDetections(sorted)
+          const top = sorted[0].class_name
+          setLastDetectedSign(top)
+          setDetectionHistory((prev) => {
+            if (prev[prev.length - 1] !== top) {
+              const newHist = [...prev, top]
+              return newHist.length > 10 ? newHist.slice(-10) : newHist
+            }
+            return prev
+          })
+        } else {
+          setDetections([])
+        }
+      }, "image/jpeg")
+    } catch (err) {
+      console.error("Detection failed:", err)
+    } finally {
+      setIsProcessing(false)
     }
-  }, [cameraActive, selectedSign, detectedAction])
+  }
+
+  const startCaptureInterval = () => {
+    if (captureTimerRef.current) clearInterval(captureTimerRef.current)
+    captureTimerRef.current = setInterval(() => captureAndDetect(), captureInterval * 1000)
+  }
+
+  useEffect(() => {
+    if (cameraActive) startCaptureInterval()
+    else if (captureTimerRef.current) clearInterval(captureTimerRef.current)
+    return () => captureTimerRef.current && clearInterval(captureTimerRef.current)
+  }, [cameraActive])
+
+  useEffect(() => {
+    if (cameraActive && selectedSign && lastDetectedSign) {
+      setValidationResult(lastDetectedSign.toLowerCase() === selectedSign.toLowerCase())
+    }
+  }, [lastDetectedSign, selectedSign, cameraActive])
+
+  const handleToggleCamera = async () => {
+    if (!selectedSign) return alert("Please select a sign to validate first!")
+    
+    if (cameraActive) {
+      toggleCamera()
+      if (captureTimerRef.current) clearInterval(captureTimerRef.current)
+      
+      // Clear the canvas overlay
+      const ctx = canvasRef.current?.getContext("2d")
+      if (ctx) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      }
+      
+      return
+    }
+  
+    try {
+      const success = await startCamera(false)
+      if (success && holisticLoaded) startCaptureInterval()
+    } catch (err) {
+      console.error("Camera access error:", err)
+    }
+  }
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -292,95 +325,42 @@ export default function ValidatePage() {
         </motion.div>
 
         {/* Right Section: Camera Validation */}
-        <motion.div
-          className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
             <h2 className="text-xl font-bold text-white">Validate Your Sign</h2>
           </div>
-
           <div className="p-6">
             <div className="flex justify-center mb-6">
-              <motion.button
-                className={`py-3 px-6 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  cameraActive
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                }`}
-                onClick={handleToggleCamera}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={!selectedSign}
-              >
+              <motion.button className={`py-3 px-6 rounded-lg font-medium transition-all flex items-center gap-2 ${cameraActive ? "bg-red-500 hover:bg-red-600 text-white" : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"}`} onClick={handleToggleCamera} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={!selectedSign}>
                 <Camera className="w-5 h-5" />
                 {cameraActive ? "Stop Validation" : "Start Validation"}
               </motion.button>
             </div>
-
             <hr className="border-gray-200 my-6" />
-
             <div className="flex flex-col items-center">
               <div className="relative w-full aspect-video bg-black/10 rounded-xl overflow-hidden shadow-lg">
-                {cameraActive ? (
-                  <>
-                    <video ref={cameraVideoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
-                    <canvas ref={canvasRef} className="hidden" />
-                  </>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                    {permissionDenied ? (
-                      <div className="text-center p-4">
-                        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                        <p>Camera access denied. Click "Start Validation" to request permission again.</p>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                        <p>Camera feed will appear here</p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="relative w-full h-full">
+                  <video ref={cameraVideoRef} className="w-full h-full object-cover absolute top-0 left-0" autoPlay playsInline muted />
+                  <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+                </div>
               </div>
-
-              <motion.div
-                className="mt-6 text-xl font-semibold"
-                animate={{
-                  scale: detectedAction !== "Waiting..." ? [1, 1.1, 1] : 1,
-                  transition: { duration: 0.5 },
-                }}
-              >
+              <motion.div className="mt-6 text-xl font-semibold" animate={{ scale: validationResult !== null ? [1, 1.1, 1] : 1, transition: { duration: 0.5 } }}>
                 {validationResult === null ? (
-                  <span className="text-black">Detected Action: {detectedAction}</span>
+                  <span className="text-black">Waiting for detection...</span>
                 ) : validationResult ? (
                   <span className="text-green-500 flex items-center gap-2">
-                  <Check className="w-5 h-5" />
-                  Correct! "{detectedAction}" matches "{selectedSign}"
+                    <Check className="w-5 h-5" /> Correct! "{lastDetectedSign}" matches "{selectedSign}"
                   </span>
                 ) : (
                   <span className="text-red-500">
-                  Incorrect. Detected "{detectedAction}", expected "{selectedSign}"
+                    Incorrect. Detected "{lastDetectedSign}", expected "{selectedSign}"
                   </span>
                 )}
-                {/* {cameraActive && (
-                  <motion.div
-                  className="mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg font-medium transition-all text-center"
-                  animate={{
-                    scale: detectedAction !== "Waiting..." ? [1, 1.1, 1] : 1,
-                    transition: { duration: 0.5, repeat: Infinity },
-                  }}
-                  >
-                  Real-time detection in progress...
-                  </motion.div>
-                )} */}
               </motion.div>
             </div>
           </div>
         </motion.div>
       </div>
-    </div>
+      </div>
   )
 }
