@@ -440,7 +440,7 @@ export default function Home() {
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
               <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl opacity-80"></div>
 
-              
+
             </motion.div>
           </div>
         </div>
@@ -448,136 +448,77 @@ export default function Home() {
 
       {/* ASL Alphabet Section */}
       <section className="w-full py-20 px-4 bg-white">
-      <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl border border-gray-100">
-                <h3 className="text-4xl font-semibold mb-6 text-center text-gray-800">ASL Alphabet</h3>
-                <div className="grid grid-cols-5 gap-4">
-                    {Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)).map((letter, index) => (
-                    <motion.div
-                      key={letter}
-                      className="aspect-square flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-gray-100"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.02 }}
-                      viewport={{ once: true }}
-                      whileHover={{
-                      scale: 1.05,
-                      rotateY: 180,
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                      }}
-                    >
-                      <div className="relative w-full h-full">
-                      <motion.span
-                        className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-600 to-purple-600"
-                        initial={{ rotateY: 0 }}
-                        whileHover={{ rotateY: 180 }}
-                        transition={{ duration: 0.6 }}
-                      >
-                        {letter}
-                      </motion.span>
-                      <motion.video
-                        id={`video-${letter}`}
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                        src={`/signs/${letter}.mp4`}
-                        muted
-                        loop
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                        onMouseEnter={(e) => {
-                        const video = e.currentTarget as HTMLVideoElement;
-                        video.play();
-                        }}
-                        onMouseLeave={(e) => {
-                        const video = e.currentTarget as HTMLVideoElement;
-                        video.pause();
-                        video.currentTime = 0;
-                        }}
-                      />
-                      </div>
-                    </motion.div>
-                    ))}
-                </div>
-
-                <div className="mt-8 text-center">
-                  <Link
-                    href="/learn"
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    <span>Learn ASL with our interactive lessons</span>
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
-                </div>
-              </div>
-        {/* <div className="max-w-6xl mx-auto">
+        <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl border border-gray-100">
+          <h3 className="text-4xl font-semibold mb-6 text-center text-gray-800">ASL Alphabet</h3>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+        {Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)).map((letter, index) => (
           <motion.div
+            key={letter}
+            className="aspect-square flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-gray-100"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.02 }}
+            viewport={{ once: true }}
+            whileHover={{
+          scale: 1.05,
+          rotateY: 180,
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            }}
+            onTap={() => {
+          const video = document.getElementById(`video-${letter}`) as HTMLVideoElement;
+          if (video) {
+            video.play();
+          }
+            }}
+          >
+            <div className="relative w-full h-full">
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-600 to-purple-600"
+            initial={{ rotateY: 0 }}
+            whileHover={{ rotateY: 180 }}
+            whileTap={{ rotateY: 180 }}
+            transition={{ duration: 0.6 }}
+          >
+            {letter}
+          </motion.span>
+          <motion.video
+            id={`video-${letter}`}
+            className="absolute inset-0 w-full h-full object-cover rounded-lg"
+            src={`/signs/${letter}.mp4`}
+            muted
+            loop
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-              Fascinating ASL Facts
-            </h2>
-            <p className="text-lg max-w-3xl mx-auto text-gray-700">
-              Discover interesting facts about American Sign Language and its impact on communication.
-            </p>
+            whileHover={{ opacity: 1 }}
+            whileTap={{ opacity: 1 }}
+            onMouseEnter={(e) => {
+              const video = e.currentTarget as HTMLVideoElement;
+              video.play();
+            }}
+            onMouseLeave={(e) => {
+              const video = e.currentTarget as HTMLVideoElement;
+              video.pause();
+              video.currentTime = 0;
+            }}
+            onTouchEnd={(e) => {
+              const video = e.currentTarget as HTMLVideoElement;
+              video.play();
+            }}
+          />
+            </div>
           </motion.div>
+        ))}
+          </div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {[
-              {
-                title: "ASL is the 3rd most used language in the US",
-                description:
-                  "After English and Spanish, ASL is the third most commonly used language in the United States.",
-                icon: "🇺🇸",
-              },
-              {
-                title: "Not Universal",
-                description:
-                  "Contrary to popular belief, sign language is not universal. Different countries have their own sign languages.",
-                icon: "🌎",
-              },
-              {
-                title: "Facial Expressions Matter",
-                description: "Facial expressions are a crucial grammatical component in ASL, not just for emotion.",
-                icon: "😊",
-              },
-              {
-                title: "ASL Has Its Own Poetry",
-                description: "ASL has a rich tradition of poetry that uses rhythm, movement, and spatial patterns.",
-                icon: "📝",
-              },
-              {
-                title: "Fingerspelling",
-                description:
-                  "ASL includes fingerspelling, which is used for proper nouns or words without specific signs.",
-                icon: "👆",
-              },
-              {
-                title: "Recognized Language",
-                description: "ASL is recognized as a complete, natural language with its own syntax and grammar rules.",
-                icon: "📚",
-              },
-            ].map((fact, i) => (
-              <motion.div
-                key={i}
-                className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100"
-                custom={i}
-                variants={fadeInUp}
-              >
-                <div className="text-4xl mb-4">{fact.icon}</div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800">{fact.title}</h3>
-                <p className="text-gray-700">{fact.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div> */}
+          <div className="mt-8 text-center">
+        <Link
+          href="/learn"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          <span>Learn ASL with our interactive lessons</span>
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Link>
+          </div>
+        </div>
       </section>
 
       {/* Interactive ASL Demo Section */}

@@ -34,22 +34,27 @@ export default function AboutPage() {
 
   const timeline = [
     {
-      year: "2022",
+      year: "August 2024",
       title: "Project Inception",
-      description: "SignSerenade began as a research project focused on making communication more accessible.",
+      description: "SignSerenade began as an application based project focused on making communication more accessible.",
     },
     {
-      year: "2023",
+      year: "December 2024",
       title: "Technology Development",
       description: "Integration of MediaPipe and custom ML models to accurately detect and translate sign language.",
     },
     {
-      year: "2024",
-      title: "Platform Launch",
-      description: "Official launch of SignSerenade with translation, learning, and validation features.",
+      year: "January 2025",
+      title: "Prototype Presentation",
+      description: "First prototype presented at a St Joseph Engineering College, receiving positive feedback from the community.",
     },
     {
-      year: "Future",
+      year: "April 2025",
+      title: "Final Product",
+      description: "Completion of the final product, showcasing real-time translation and interactive learning features.",
+    },
+    {
+      year: "Future Plans",
       title: "Expanding Horizons",
       description: "Plans to support multiple sign languages and develop mobile applications for wider accessibility.",
     },
@@ -93,7 +98,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 px-4 bg-white/5 backdrop-blur-sm">
+      <section className="py-16 px-4 bg-gray-200 backdrop-blur-sm">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -102,19 +107,19 @@ export default function AboutPage() {
               transition={{ duration: 0.7 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Our Mission</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-900">Our Mission</h2>
               <div className="w-16 h-1 bg-[#c7d7f5] mb-6"></div>
-              <p className="text-gray-300 mb-6 text-lg">
+              <p className="text-blue-900 mb-6 text-lg">
                 SignSerenade is dedicated to bridging the communication gap between the deaf and hearing communities
                 through cutting-edge technology. We believe that language should never be a barrier to human connection.
               </p>
-              <p className="text-gray-300 mb-6 text-lg">
+              <p className="text-blue-900 mb-6 text-lg">
                 By leveraging artificial intelligence and machine learning, we've created a platform that not only
                 translates sign language in real-time but also provides an interactive learning environment for those
                 wanting to learn sign language.
               </p>
-              <div className="flex items-center text-[#c7d7f5]">
-                <Lightbulb className="mr-2" />
+              <div className="flex items-center text-black">
+                <Lightbulb className="text-yellow-500 mr-2" />
                 <span className="font-medium">Empowering communication for everyone, everywhere.</span>
               </div>
             </motion.div>
@@ -140,7 +145,7 @@ export default function AboutPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 ">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -178,7 +183,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 backdrop-blur-sm">
+      {/* <section className="py-16 px-4 bg-gray-200 backdrop-blur-sm">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -187,9 +192,9 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Sign Language Impact</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-900">Sign Language Impact</h2>
             <div className="w-16 h-1 bg-[#c7d7f5] mx-auto mb-6"></div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-blue-900 max-w-3xl mx-auto">
               American Sign Language (ASL) is a complete, natural language that has the same linguistic properties as
               spoken languages.
             </p>
@@ -203,12 +208,65 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white/5 p-6 rounded-xl text-center border border-white/10 hover:bg-white/10 transition-all duration-300"
+                className="bg-gray-50 p-6 rounded-xl text-center border border-white/10 hover:bg-white/10 transition-all duration-300"
               >
-                <p className="text-4xl font-bold text-[#c7d7f5] mb-2">{stat.value}</p>
-                <p className="text-gray-300">{stat.label}</p>
+                <p className="text-4xl font-bold text-[#16243f] mb-2">{stat.value}</p>
+                <p className="text-blue-900">{stat.label}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section> */}
+      <section className="py-16 px-4 bg-gray-200 backdrop-blur-sm">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="rounded-xl overflow-hidden shadow-2xl order-2 md:order-1"
+            >
+              <img
+                src="/placeholder.svg?key=ogbu0"
+                alt="American Sign Language Alphabet"
+                className="w-full h-auto object-cover"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="order-1 md:order-2"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-900">About American Sign Language</h2>
+              <div className="w-16 h-1 bg-[#c7d7f5] mb-6"></div>
+              <p className="text-blue-900 mb-6 text-lg">
+                American Sign Language (ASL) is a complete, natural language that has the same linguistic properties as
+                spoken languages, with grammar that differs from English. It is the primary language of many North
+                Americans who are deaf and hard of hearing.
+              </p>
+              <p className="text-blue-900 mb-6 text-lg">
+                ASL is expressed by movements of the hands and face. It is the primary language of many North Americans
+                who are deaf and is one of several communication options used by people who are deaf or hard-of-hearing.
+              </p>
+              <div className="flex flex-col space-y-4 text-blue-900">
+                <div className="flex items-start">
+                  <Globe className="mr-3 text-[#091120] mt-1 flex-shrink-0" />
+                  <p>ASL is used in the United States and most of Canada</p>
+                </div>
+                <div className="flex items-start">
+                  <Users className="mr-3 text-[#091120] mt-1 flex-shrink-0" />
+                  <p>Estimated 250,000-500,000 people use ASL as their primary language</p>
+                </div>
+                <div className="flex items-start">
+                  <Heart className="mr-3 text-[#091120] mt-1 flex-shrink-0" />
+                  <p>ASL is a crucial part of Deaf culture and community identity</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -262,7 +320,7 @@ export default function AboutPage() {
       </section>
 
       {/* ASL Information Section */}
-      <section className="py-16 px-4 bg-white/5 backdrop-blur-sm">
+      {/* <section className="py-16 px-4 bg-white/5 backdrop-blur-sm">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -314,7 +372,7 @@ export default function AboutPage() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-blue-800/50 to-purple-800/50">

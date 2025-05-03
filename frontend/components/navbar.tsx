@@ -112,7 +112,7 @@ export default function Navbar() {
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`inline-flex items-center justify-center p-2 rounded-full ${
-                  scrolled ? "text-blue-700 hover:bg-blue-50" : "text-white hover:bg-white/10"
+                  scrolled ? "text-blue-700 hover:bg-blue-50" : "text-blue-900 hover:bg-white/10"
                 } transition-colors duration-200`}
                 aria-expanded={isOpen}
                 aria-label="Toggle menu"
@@ -137,7 +137,7 @@ export default function Navbar() {
                       exit={{ rotate: -90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Menu className="block h-6 w-6" aria-hidden="true" />
+                      <Menu className="block  h-6 w-6" aria-hidden="true" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -186,7 +186,7 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
-            <div className="border-t border-gray-200 pt-4 pb-6 px-5">
+            {/* <div className="border-t border-gray-200 pt-4 pb-6 px-5">
               <div className="flex items-center">
                 <div className="bg-blue-600 p-2 rounded-full">
                   <Hand className="w-5 h-5 text-white" />
@@ -196,7 +196,7 @@ export default function Navbar() {
               <div className="mt-6 text-center text-sm text-gray-500">
                 &copy; {new Date().getFullYear()} SignSerenade. All rights reserved.
               </div>
-            </div>
+            </div> */}
           </motion.div>
         )}
       </AnimatePresence>
