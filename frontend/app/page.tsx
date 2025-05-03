@@ -183,7 +183,7 @@ export default function Home() {
         </div>
 
         {/* Scroll Down Indicator */}
-        <motion.div
+        {/* <motion.div
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white"
           initial={{ opacity: 0 }}
           animate={{
@@ -208,7 +208,7 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </div>
-        </motion.div>
+        </motion.div> */}
       </section>
 
       {/* About Project Section */}

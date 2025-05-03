@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Home, Info, Users, Languages, BookOpen, Scan, Settings, Fingerprint, Menu, X, Hand } from "lucide-react"
+import Image from "next/image"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -51,7 +52,7 @@ export default function Navbar() {
     <>
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-gray/50 backdrop-blur-md shadow-md" : "bg-transparent"
+          scrolled ? "bg-gray/50 backdrop-blur-md shadow-md" : "bg-gray/80 backdrop-blur-none shadow-none"
         }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -59,54 +60,52 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 z-10">
-              <div className="relative flex items-center">
-                <div className="p-2 rounded-full">
-                  <Hand className={`w-6 h-6 text-white ${scrolled ? "text-white": "text-gray-900"}`}/>
-                </div>
-                <motion.div
-                  className={`ml-3 font-bold text-xl ${scrolled ? "text-white": "text-gray-900"}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  SignSerenade
-                </motion.div>
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative
-                    ${
-                      pathname === link.href
-                        ? scrolled
-                          ? "text-blue-700 bg-blue-50"
-                          : "text-white bg-blue-700/30"
-                        : scrolled
-                          ? "text-gray-700 hover:bg-gray-100"
-                          : "text-gray-200 hover:bg-white/10"
-                    }`}
-                >
-                  <span className="flex items-center gap-2">
-                    {link.icon}
-                    {link.label}
-                  </span>
-                  {pathname === link.href && (
-                    <motion.div
-                      className={`absolute bottom-0 left-0 right-0 h-0.5 ${scrolled ? "bg-blue-600" : "bg-white"}`}
-                      layoutId="navbar-underline"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              ))}
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2 z-10">
+          <div className="relative flex items-center">
+            <div className="p-2 rounded-full">
+          <Image 
+          src="/favicon.ico" 
+          alt="SignSerenade Logo" 
+          width={24} 
+          height={24} 
+          className="w-6 h-6"
+          />
             </div>
+            <motion.div
+          className={`ml-3 font-bold text-xl ${scrolled ? "text-gray-900": "text-gray-900"}`}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+            >
+          SignSerenade
+            </motion.div>
+          </div>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-1">
+          {links.map((link) => (
+            <Link
+          key={link.href}
+          href={link.href}
+          className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative
+            ${pathname === link.href ? "text-blue-700 bg-blue-50" : "text-gray-700 hover:bg-gray-50"}`}
+            >
+          <span className="flex items-center gap-2">
+            {link.icon}
+            {link.label}
+          </span>
+          {pathname === link.href && (
+            <motion.div
+              className={`absolute bottom-0 left-0 right-0 h-0.5 ${scrolled ? "bg-blue-600" : "bg-white"}`}
+              layoutId="navbar-underline"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            />
+          )}
+            </Link>
+          ))}
+        </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">

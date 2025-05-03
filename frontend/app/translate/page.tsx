@@ -85,7 +85,7 @@ export default function TranslatePage() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        Translate between sign language and text using our advanced YOLOv3 model for real-time sign detection
+        Translate between sign language and text using our advanced YOLOv11 model for real-time sign detection
       </motion.p>
 
       <div className="grid grid-cols-1 gap-8">
@@ -122,7 +122,7 @@ export default function TranslatePage() {
             <h2 className="text-xl font-bold text-white">Text to Sign Language</h2>
           </div>
 
-          <div className="p-6">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             {error && (
               <motion.div
                 className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-left"
@@ -135,34 +135,79 @@ export default function TranslatePage() {
                 </div>
               </motion.div>
             )}
+            <div>
+              <form onSubmit={handleTranslate} className="mb-6">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter text to translate to sign language..."
+                    className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    required
+                    disabled={isTranslating}
+                  />
+                  <motion.button
+                    type="submit"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2 rounded-lg disabled:opacity-50"
+                    whileHover={{ scale: 1.05 }}
+                    disabled={isTranslating || !inputText.trim()}
+                  >
+                    {isTranslating ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </motion.button>
+                </div>
+              </form>
 
-            <form onSubmit={handleTranslate} className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Enter text to translate to sign language..."
-                  className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  required
-                  disabled={isTranslating}
-                />
-                <motion.button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-2 rounded-lg disabled:opacity-50"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  disabled={isTranslating || !inputText.trim()}
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => {
+                    setInputText("");
+                    setTranslatedVideos([]);
+                    setCurrentVideoIndex(0);
+                    setError(null);
+                    setVideoError(false);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
                 >
-                  {isTranslating ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </motion.button>
+                  Clear
+                </button>
+                <button
+                  onClick={() => {
+                  if (translatedVideos.length > 0 && videoRef.current) {
+                    setCurrentVideoIndex(0);
+                    videoRef.current.currentTime = 0;
+                    videoRef.current.src = translatedVideos[0];
+                    videoRef.current.play().catch((err) => console.error("Error replaying video:", err));
+                  }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                  disabled={translatedVideos.length === 0}
+                >
+                  Replay
+                </button>
               </div>
-            </form>
 
+                {translatedVideos.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {translatedVideos.map((video, index) => (
+                    <button
+                    key={index}
+                    onClick={() => setCurrentVideoIndex(index)}
+                    className={`px-3 py-1 rounded-lg text-sm ${currentVideoIndex === index
+                    ? "bg-purple-500 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                    >
+                    {video.split("/").pop()?.split(".")[0] || `Word ${index + 1}`}
+                    </button>
+                  ))}
+                </div>
+                )}
+            </div>
             <div className="flex flex-col items-center">
               {translatedVideos.length > 0 ? (
                 <motion.div className="w-full" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

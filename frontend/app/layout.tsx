@@ -10,7 +10,7 @@ import { ModalProvider } from "@/context/modal-context"
 import DetectionDebugger from "@/components/detection_debugger"
 import MediaPipeDiagnostics from "@/components/mediapipe-diagnostics"
 import Head from "next/head"
-
+import Footer from "@/components/footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -40,13 +40,14 @@ export default function RootLayout({
       <body className={inter.className}>
         <ModalProvider>
           <Navbar />
-          <main className="pt-16">
+          <main className="pt-16 min-h-screen bg-gray-50 dark:bg-gray-900">
             {children}
             {/* <CameraDebug /> */}
             {/* <BackendDebug />
             <BackendConnectionChecker /> */}
             <DetectionDebugger />
             {/* <MediaPipeDiagnostics /> */}
+            <Footer />
           </main>
         </ModalProvider>
       </body>
