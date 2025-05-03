@@ -84,8 +84,42 @@ export default function ValidatePage() {
 
     canvas.width = cameraVideoRef.current.videoWidth || 640
     canvas.height = cameraVideoRef.current.videoHeight || 480
-    context.drawImage(cameraVideoRef.current, 0, 0, canvas.width, canvas.height)
 
+    // Draw a black screen
+    context.fillStyle = "black"
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Use MediaPipe Holistic for landmark detection
+    const holistic = new window.Holistic({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+    })
+
+    holistic.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: true,
+      smoothSegmentation: true,
+      refineFaceLandmarks: true,
+    })
+
+    holistic.onResults((results) => {
+      if (results.poseLandmarks) {
+        drawLandmarks(context, results.poseLandmarks, { color: "white", lineWidth: 2 })
+      }
+      if (results.faceLandmarks) {
+        drawLandmarks(context, results.faceLandmarks, { color: "cyan", lineWidth: 1 })
+      }
+      if (results.leftHandLandmarks) {
+        drawLandmarks(context, results.leftHandLandmarks, { color: "green", lineWidth: 2 })
+      }
+      if (results.rightHandLandmarks) {
+        drawLandmarks(context, results.rightHandLandmarks, { color: "red", lineWidth: 2 })
+      }
+    })
+
+    holistic.send({ image: cameraVideoRef.current })
+
+    // Send the real-time image to the backend
     canvas.toBlob(async (blob) => {
       if (!blob) return
 
@@ -323,14 +357,25 @@ export default function ValidatePage() {
                   <span className="text-black">Detected Action: {detectedAction}</span>
                 ) : validationResult ? (
                   <span className="text-green-500 flex items-center gap-2">
-                    <Check className="w-5 h-5" />
-                    Correct! "{detectedAction}" matches "{selectedSign}"
+                  <Check className="w-5 h-5" />
+                  Correct! "{detectedAction}" matches "{selectedSign}"
                   </span>
                 ) : (
                   <span className="text-red-500">
-                    Incorrect. Detected "{detectedAction}", expected "{selectedSign}"
+                  Incorrect. Detected "{detectedAction}", expected "{selectedSign}"
                   </span>
                 )}
+                {/* {cameraActive && (
+                  <motion.div
+                  className="mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg font-medium transition-all text-center"
+                  animate={{
+                    scale: detectedAction !== "Waiting..." ? [1, 1.1, 1] : 1,
+                    transition: { duration: 0.5, repeat: Infinity },
+                  }}
+                  >
+                  Real-time detection in progress...
+                  </motion.div>
+                )} */}
               </motion.div>
             </div>
           </div>
