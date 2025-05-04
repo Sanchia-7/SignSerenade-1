@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { Camera, Check, AlertCircle, Info } from "lucide-react"
 import { validateSign } from "@/lib/api-client"
 import { useModal } from "@/context/modal-context"
-import { SIGN_ACTIONS, API_CONFIG } from "@/config/api-config"
+import { MODEL_SIGN_ACTIONS, API_CONFIG } from "@/config/api-config"
 import { useCamera } from "@/hooks/use-camera"
 
 export default function ValidatePage() {
@@ -42,11 +42,11 @@ export default function ValidatePage() {
   useEffect(() => {
     async function loadAvailableSigns() {
       try {
-        const response = await fetch("/api/available-signs")
+        const response = await fetch("/api/avail-signs")
         const data = await response.json()
-        setAvailableSigns([...new Set(data.signs || SIGN_ACTIONS)])
+        setAvailableSigns([...new Set(data.signs || MODEL_SIGN_ACTIONS)])
       } catch (error) {
-        setAvailableSigns([...new Set(SIGN_ACTIONS)])
+        setAvailableSigns([...new Set(MODEL_SIGN_ACTIONS)])
       }
     }
     loadAvailableSigns()
@@ -230,9 +230,10 @@ export default function ValidatePage() {
   
 
   return (
+    <div className="bg-gradient-to-b from-[#4a628a] to-[#c7d7f5] min-h-screen flex items-center justify-center">
     <div className="container mx-auto px-4 py-8">
       <motion.h1
-        className="text-4xl font-bold mb-8 text-black text-center"
+        className="text-4xl font-bold mb-8 text-white text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -267,11 +268,11 @@ export default function ValidatePage() {
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
                   />
-                  <datalist id="signs-list">
+                  {/* <datalist id="signs-list">
                     {availableSigns.map((sign) => (
                       <option key={sign} value={sign} />
                     ))}
-                  </datalist>
+                  </datalist> */}
                 </div>
 
                 <motion.button
@@ -362,5 +363,6 @@ export default function ValidatePage() {
         </motion.div>
       </div>
       </div>
+    </div>
   )
 }

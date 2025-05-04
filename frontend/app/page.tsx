@@ -414,7 +414,7 @@ export default function Home() {
       </section>
 
       {/* ASL Alphabet Section */}
-      <section className="w-full py-20 px-4 bg-white">
+      <section className="w-full px-4 md:px-20 py-20 bg-white">
         <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl border border-gray-100">
           <h3 className="text-4xl font-semibold mb-6 text-center text-gray-800">ASL Alphabet</h3>
           <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
@@ -777,7 +777,7 @@ export default function Home() {
 
 
       <footer className="text-center p-2 italic bg-black/90 text-sm text-white bottom-0 w-full">
-        <p>&copy; {new Date().getFullYear()} SignSerenade:Your Voice in Signs | Developed by Cows🐮🐄</p>
+        <p>&copy; {new Date().getFullYear()} SignSerenade:Your Voice in Signs </p>
       </footer>
     </div>
   )

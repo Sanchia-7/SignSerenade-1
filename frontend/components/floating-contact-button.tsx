@@ -90,7 +90,7 @@ export default function FloatingContactButton() {
     },
     hover: {
       scale: 1.1,
-      boxShadow: "0 0 20px rgba(240, 240, 160, 0.7)",
+      boxShadow: "0 0 20px rgb(167, 199, 231)",
     },
     tap: {
       scale: 0.9,
@@ -115,8 +115,7 @@ export default function FloatingContactButton() {
         initial="closed"
         whileHover="hover"
         whileTap="tap"
-        className={`relative flex h-12 w-12 items-center justify-center rounded-full ${isOpen ? "bg-[#F0F0A0]" : "bg-[#F0F0A0]"
-          } text-gray-800 shadow-lg transition-colors duration-300`}
+        className="relative bg-gradient-to-r from-blue-400 to-purple-600 flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition-colors duration-300"
       >
         <motion.div
           animate={{

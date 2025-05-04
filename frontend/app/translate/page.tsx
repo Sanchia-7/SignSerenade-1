@@ -70,9 +70,11 @@ export default function TranslatePage() {
   }, [currentVideoIndex, translatedVideos])
 
   return (
+    <div className="bg-gradient-to-b from-[#4a628a] to-[#c7d7f5] min-h-screen flex items-center justify-center">
+
     <div className="container mx-auto px-4 py-12">
       <motion.h1
-        className="text-4xl font-bold mb-2 text-black text-center"
+        className="text-4xl font-bold mb-2 text-white text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -80,7 +82,7 @@ export default function TranslatePage() {
       </motion.h1>
 
       <motion.p
-        className="text-gray-600 text-center mb-12 max-w-2xl mx-auto"
+        className="text-gray-200 text-center mb-12 max-w-2xl mx-auto"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -262,6 +264,7 @@ export default function TranslatePage() {
           </div>
         </motion.div>
       </div>
+    </div>
     </div>
   )
 }

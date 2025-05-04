@@ -128,9 +128,9 @@ export default function BackendConnectionChecker() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-30 right-4 bg-blue-600 text-white px-3 py-1 rounded-md text-xs flex items-center gap-1 z-50"
+        className="fixed bottom-30 right-4 bg-gradient-to-r from-blue-400 to-purple-600 text-white px-3 py-1 rounded-md text-xs flex items-center gap-1 z-50"
       >
-        <AlertCircle className="w-3 h-3" />
+        <AlertCircle className="w-4 h-4" />
         Backend Connection
       </button>
     )

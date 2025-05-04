@@ -30,6 +30,10 @@ export const SIGN_ACTIONS = [
   "yourself", "z"
 ]
 
+export const MODEL_SIGN_ACTIONS = [
+  'Are','Can','Come','Dont','Going','Hello','Help','Here','How','I','Name',
+  'Need','Please','Thanks','This','Today','Understand','What','Where','You','Your'
+]
 
 // Configuration for connecting to the Python backend
 const getApiBaseUrl = () => {
