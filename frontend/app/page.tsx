@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Languages, BookOpen, Target, ArrowRight, Play, Pause } from "lucide-react"
+import { Languages, BookOpen, Target, ArrowRight, Play, Pause } from 'lucide-react'
 import { useEffect, useRef, useState } from "react"
 
 export default function Home() {
@@ -330,116 +330,85 @@ export default function Home() {
       {/* American Sign Language Section */}
       <section className="w-full py-20 px-4 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="text-center mb-16"
-          >
-        <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-          American Sign Language
-        </h2>
-        <p className="text-lg max-w-3xl mx-auto text-gray-700">
-          American Sign Language (ASL) is a complete, natural language that has the same linguistic properties as
-          spoken languages, with grammar that differs from English.
-        </p>
-          </motion.div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+              American Sign Language
+            </h2>
+            <p className="text-lg max-w-3xl mx-auto text-gray-700">
+              American Sign Language (ASL) is a complete, natural language that has the same linguistic properties as
+              spoken languages, with grammar that differs from English.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 gap-12 items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <h3 className="text-2xl font-semibold mb-4 text-gray-800">The Rich History of ASL</h3>
-          <p className="text-gray-700 mb-6">
-            ASL originated in the early 19th century at the American School for the Deaf (ASD), founded in 1817. It
-            evolved from a combination of French Sign Language, various local sign languages, and home signs.
-          </p>
+            <div>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">The Rich History of ASL</h3>
+              <p className="text-gray-700 mb-6">
+                ASL originated in the early 19th century at the American School for the Deaf (ASD), founded in 1817. It
+                evolved from a combination of French Sign Language, various local sign languages, and home signs.
+              </p>
 
-          <h3 className="text-2xl font-semibold mb-4 text-gray-800">ASL: A Complete Language</h3>
-          <p className="text-gray-700 mb-6">
-            ASL is a visual language that incorporates gestures, facial expressions, head movements, and body
-            language. It has its own grammar, syntax, and rules that differ from English, making it a unique and
-            complete language.
-          </p>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-800">ASL: A Complete Language</h3>
+              <p className="text-gray-700 mb-6">
+                ASL is a visual language that incorporates gestures, facial expressions, head movements, and body
+                language. It has its own grammar, syntax, and rules that differ from English, making it a unique and
+                complete language.
+              </p>
 
-          <div className="space-y-4">
-            <motion.div
-          className="flex items-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          viewport={{ once: true }}
+              <div className="space-y-4">
+                <div
+                  className="flex items-center"
+                >
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                    <span className="text-blue-600 font-bold">1</span>
+                  </div>
+                  <p className="text-gray-800">
+                    <strong>Visual-Spatial Language:</strong> Uses space, movement, and non-manual markers
+                  </p>
+                </div>
+
+                <div
+                  className="flex items-center"
+                >
+                  <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-4">
+                    <span className="text-purple-600 font-bold">2</span>
+                  </div>
+                  <p className="text-gray-800">
+                    <strong>Unique Grammar:</strong> Different word order and structure from English
+                  </p>
+                </div>
+
+                <div
+                  className="flex items-center"
+                >
+                  <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                    <span className="text-indigo-600 font-bold">3</span>
+                  </div>
+                  <p className="text-gray-800">
+                    <strong>Regional Variations:</strong> Like spoken languages, ASL has dialects and accents
+                  </p>
+                </div>
+
+                <div
+                  className="flex items-center"
+                >
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                    <span className="text-blue-600 font-bold">4</span>
+                  </div>
+                  <p className="text-gray-800">
+                    <strong>Cultural Component:</strong> Deeply connected to Deaf culture and community
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="relative"
             >
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-            <span className="text-blue-600 font-bold">1</span>
-          </div>
-          <p className="text-gray-800">
-            <strong>Visual-Spatial Language:</strong> Uses space, movement, and non-manual markers
-          </p>
-            </motion.div>
-
-            <motion.div
-          className="flex items-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          viewport={{ once: true }}
-            >
-          <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-4">
-            <span className="text-purple-600 font-bold">2</span>
-          </div>
-          <p className="text-gray-800">
-            <strong>Unique Grammar:</strong> Different word order and structure from English
-          </p>
-            </motion.div>
-
-            <motion.div
-          className="flex items-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          viewport={{ once: true }}
-            >
-          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
-            <span className="text-indigo-600 font-bold">3</span>
-          </div>
-          <p className="text-gray-800">
-            <strong>Regional Variations:</strong> Like spoken languages, ASL has dialects and accents
-          </p>
-            </motion.div>
-
-            <motion.div
-          className="flex items-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          viewport={{ once: true }}
-            >
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
-            <span className="text-blue-600 font-bold">4</span>
-          </div>
-          <p className="text-gray-800">
-            <strong>Cultural Component:</strong> Deeply connected to Deaf culture and community
-          </p>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="relative"
-        >
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl opacity-80"></div>
-        </motion.div>
+              <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl opacity-80"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -449,72 +418,54 @@ export default function Home() {
         <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl border border-gray-100">
           <h3 className="text-4xl font-semibold mb-6 text-center text-gray-800">ASL Alphabet</h3>
           <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-        {Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)).map((letter, index) => (
-          <motion.div
-            key={letter}
-            className="aspect-square flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-gray-100"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.02 }}
-            viewport={{ once: true }}
-            whileHover={{
-          scale: 1.05,
-          rotateY: 180,
-          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            }}
-            onTap={() => {
-          const video = document.getElementById(`video-${letter}`) as HTMLVideoElement;
-          if (video) {
-            video.play();
-          }
-            }}
-          >
-            <div className="relative w-full h-full">
-          <motion.span
-            className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-600 to-purple-600"
-            initial={{ rotateY: 0 }}
-            whileHover={{ rotateY: 180 }}
-            whileTap={{ rotateY: 180 }}
-            transition={{ duration: 0.6 }}
-          >
-            {letter}
-          </motion.span>
-          <motion.video
-            id={`video-${letter}`}
-            className="absolute inset-0 w-full h-full object-cover rounded-lg"
-            src={`/signs/${letter}.mp4`}
-            muted
-            loop
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            whileTap={{ opacity: 1 }}
-            onMouseEnter={(e) => {
-              const video = e.currentTarget as HTMLVideoElement;
-              video.play();
-            }}
-            onMouseLeave={(e) => {
-              const video = e.currentTarget as HTMLVideoElement;
-              video.pause();
-              video.currentTime = 0;
-            }}
-            onTouchEnd={(e) => {
-              const video = e.currentTarget as HTMLVideoElement;
-              video.play();
-            }}
-          />
-            </div>
-          </motion.div>
-        ))}
+            {Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)).map((letter, index) => (
+              <div
+                key={letter}
+                className="aspect-square flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-sm border border-gray-100 hover:scale-105 transition-transform"
+                onClick={() => {
+                  const video = document.getElementById(`video-${letter}`) as HTMLVideoElement;
+                  if (video) {
+                    video.play();
+                  }
+                }}
+              >
+                <div className="relative w-full h-full">
+                  <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-600 to-purple-600">
+                    {letter}
+                  </span>
+                  <video
+                    id={`video-${letter}`}
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg opacity-0 hover:opacity-100 transition-opacity"
+                    src={`/signs/${letter}.mp4`}
+                    muted
+                    loop
+                    onMouseEnter={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.play();
+                    }}
+                    onMouseLeave={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.pause();
+                      video.currentTime = 0;
+                    }}
+                    onTouchEnd={(e) => {
+                      const video = e.currentTarget as HTMLVideoElement;
+                      video.play();
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="mt-8 text-center">
-        <Link
-          href="/learn"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          <span>Learn ASL with our interactive lessons</span>
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Link>
+            <Link
+              href="/learn"
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <span>Learn ASL with our interactive lessons</span>
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
           </div>
         </div>
       </section>
@@ -734,31 +685,15 @@ export default function Home() {
       {/* Call to Action */}
       <section className="w-full py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold mb-6"
-          >
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Experience SignSerenade?
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-lg mb-8 text-gray-100"
-          >
+          <p className="text-lg mb-8 text-gray-100">
             Start translating sign language or begin your learning journey today.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
+          <div
             className="flex flex-col sm:flex-row gap-6 justify-center"
           >
             <Link
@@ -791,7 +726,7 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4" />
               </motion.span>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -841,9 +776,9 @@ export default function Home() {
       `}</style>
 
 
-<footer className="text-center p-2 italic bg-black/90 text-sm text-white bottom-0 w-full">
-            <p>&copy; {new Date().getFullYear()} SignSerenade:Your Voice in Signs | Developed by Cows🐮🐄</p>
-        </footer>
+      <footer className="text-center p-2 italic bg-black/90 text-sm text-white bottom-0 w-full">
+        <p>&copy; {new Date().getFullYear()} SignSerenade:Your Voice in Signs | Developed by Cows🐮🐄</p>
+      </footer>
     </div>
   )
 }
