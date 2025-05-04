@@ -11,6 +11,7 @@ import DetectionDebugger from "@/components/detection_debugger"
 import MediaPipeDiagnostics from "@/components/mediapipe-diagnostics"
 import Head from "next/head"
 import Footer from "@/components/footer"
+import FloatingContactButton from "@/components/floating-contact-button"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -42,12 +43,13 @@ export default function RootLayout({
           <Navbar />
           <main className="pt-16 min-h-screen bg-gray-50 dark:bg-gray-900">
             {children}
+            <FloatingContactButton />
             {/* <CameraDebug /> */}
             {/* <BackendDebug />
-            <BackendConnectionChecker /> */}
-            <DetectionDebugger />
+            <BackendConnectionChecker />
+            <DetectionDebugger /> */}
             {/* <MediaPipeDiagnostics /> */}
-            <Footer />
+            {/* <Footer /> */}
           </main>
         </ModalProvider>
       </body>

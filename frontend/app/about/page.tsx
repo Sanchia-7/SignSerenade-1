@@ -228,7 +228,7 @@ export default function AboutPage() {
               className="rounded-xl overflow-hidden shadow-2xl order-2 md:order-1"
             >
               <img
-                src="/placeholder.svg?key=ogbu0"
+                src="/asl.jpg?key=ogbu0"
                 alt="American Sign Language Alphabet"
                 className="w-full h-auto object-cover"
               />

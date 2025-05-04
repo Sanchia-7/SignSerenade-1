@@ -57,6 +57,7 @@ export default function LearnPage() {
   }
 
   return (
+    <div className="bg-gradient-to-b from-[#4a628a] to-[#c7d7f5] min-h-screen flex items-center justify-center">
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <motion.h1
         className="text-4xl font-bold mb-8 text-black text-center"
@@ -67,7 +68,7 @@ export default function LearnPage() {
       </motion.h1>
 
       <motion.div
-        className="bg-white/10 backdrop-blur-sm p-6 rounded-xl shadow-lg"
+        className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -158,6 +159,7 @@ export default function LearnPage() {
           </Link>
         </motion.div>
       </motion.div>
+    </div>
     </div>
   )
 }

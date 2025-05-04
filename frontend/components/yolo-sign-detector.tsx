@@ -367,10 +367,10 @@ export default function YoloSignDetector() {
                     ))}
                   </div>
 
-                  <div className="mt-4">
+                  {/* <div className="mt-4">
                     <p className="font-medium text-gray-700">Detected Sentence:</p>
                     <p className="text-xl mt-2">{detectionHistory.join(" ")}</p>
-                  </div>
+                  </div> */}
 
                   <button
                     onClick={() => setDetectionHistory([])}

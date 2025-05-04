@@ -114,13 +114,15 @@ export default function QuizPage() {
   }
 
   return (
+    <div className="bg-gradient-to-b from-[#4a628a] to-[#c7d7f5] min-h-screen flex items-center justify-center">
+      
     <div className="container mx-auto px-4 py-12 text-center max-w-4xl">
       <motion.h1
         className="text-4xl font-bold mb-8 text-black"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        Learn Sign Language
+        Sign Language Quiz
       </motion.h1>
 
       {error && (
@@ -237,6 +239,7 @@ export default function QuizPage() {
           )}
         </div>
       </motion.div>
+    </div>
     </div>
   )
 }

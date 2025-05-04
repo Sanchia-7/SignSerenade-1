@@ -206,7 +206,7 @@ export default function DetectionDebugger() {
     return (
       <button
         onClick={() => setShowDebugger(true)}
-        className="fixed bottom-28 right-4 bg-red-600 text-white px-3 py-1 rounded-md text-xs flex items-center gap-1 z-50"
+        className="fixed bottom-28 right-4 bg-blue-600 text-white px-3 py-1 rounded-md text-xs flex items-center gap-1 z-50"
       >
         <Bug className="w-3 h-3" />
         Detection Debugger
