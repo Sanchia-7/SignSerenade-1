@@ -22,7 +22,7 @@ export const SIGN_ACTIONS = [
   "see", "self", "sign", "sing", "so", "sound",
   "stay", "study", "t", "talk", "television",
   "thank", "that", "they", "this", "those", "time",
-  "to", "today", "tV", "tv", "type", "u","understand", "us", "v",
+  "to", "today", "tV", "tv", "type", "u", "understand", "us", "v",
   "w", "walk", "wash", "way", "we", "welcome", "what",
   "when", "where", "which", "who", "whole", "whose",
   "why", "why", "will", "with", "without", "words",
@@ -31,8 +31,8 @@ export const SIGN_ACTIONS = [
 ]
 
 export const MODEL_SIGN_ACTIONS = [
-  'Are','Can','Come','Dont','Going','Hello','Help','Here','How','I','Name',
-  'Need','Please','Thanks','This','Today','Understand','What','Where','You','Your'
+  'Are', 'Can', 'Come', 'Dont', 'Going', 'Hello', 'Help', 'Here', 'How', 'I', 'Name',
+  'Need', 'Please', 'Thanks', 'This', 'Today', 'Understand', 'What', 'Where', 'You', 'Your'
 ]
 
 // Configuration for connecting to the Python backend
@@ -67,6 +67,6 @@ export const API_CONFIG = {
     detect: "/detect",
     health: "/health", // Add explicit health endpoint
   },
-  modelPath: "best.pt", // Path to the YOLO model
+  modelPath: "best(4).pt", // Path to the YOLO model
   modelVersion: "YOLOv11m", // Update to match your model version
 }
