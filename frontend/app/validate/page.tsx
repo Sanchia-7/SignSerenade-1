@@ -15,7 +15,7 @@ export default function ValidatePage() {
   const [videoError, setVideoError] = useState(false)
   const [availableSigns, setAvailableSigns] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const [captureInterval, setCaptureInterval] = useState(4)
   const [detections, setDetections] = useState<any[]>([])
@@ -53,20 +53,40 @@ export default function ValidatePage() {
   }, [])
 
   const handleSignSelection = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+  
     if (inputRef.current && inputRef.current.value.trim()) {
-      const sign = inputRef.current.value.trim()
-      setSelectedSign(sign)
-      setVideoError(false)
+      const sign = inputRef.current.value.trim();
+  
+      setSelectedSign(sign);
+      setReferenceVideo(""); // Clear current video
+      setVideoError(false);
+  
       try {
-        const videos = await validateSign(sign)
-        setReferenceVideo(videos[0] || "")
-        setVideoError(videos.length === 0)
+        const videos = await validateSign(sign);
+        if (videos.length > 0) {
+          const newVideo = videos[0];
+          setReferenceVideo(newVideo);
+  
+          // Wait for next render cycle so the video element updates
+          requestAnimationFrame(() => {
+            if (videoRef.current) {
+              videoRef.current.load();
+              videoRef.current.play().catch(() => {
+                // Handle autoplay rejection if needed
+              });
+            }
+          });
+        } else {
+          setVideoError(true);
+        }
       } catch {
-        setVideoError(true)
+        setVideoError(true);
       }
     }
-  }
+  };
+  
+  
 
   const handleVideoError = () => {
     setVideoError(true)
@@ -192,7 +212,7 @@ export default function ValidatePage() {
     captureTimerRef.current = setInterval(() => captureAndDetect(), captureInterval * 1000)
   }
 
-  useEffect(() => {
+  useEffect(()=>{
     if (cameraActive) startCaptureInterval()
     else if (captureTimerRef.current) clearInterval(captureTimerRef.current)
     return () => captureTimerRef.current && clearInterval(captureTimerRef.current)
@@ -206,20 +226,20 @@ export default function ValidatePage() {
 
   const handleToggleCamera = async () => {
     if (!selectedSign) return alert("Please select a sign to validate first!")
-    
+
     if (cameraActive) {
       toggleCamera()
       if (captureTimerRef.current) clearInterval(captureTimerRef.current)
-      
+
       // Clear the canvas overlay
       const ctx = canvasRef.current?.getContext("2d")
       if (ctx) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       }
-      
+
       return
     }
-  
+
     try {
       const success = await startCamera(false)
       if (success && holisticLoaded) startCaptureInterval()
@@ -227,141 +247,142 @@ export default function ValidatePage() {
       console.error("Camera access error:", err)
     }
   }
-  
+
 
   return (
     <div className="bg-gradient-to-b from-[#4a628a] to-[#c7d7f5] min-h-screen flex items-center justify-center">
-    <div className="container mx-auto px-4 py-8">
-      <motion.h1
-        className="text-4xl font-bold mb-8 text-white text-center"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        Sign Validator
-      </motion.h1>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left Section: Select Sign */}
-        <motion.div
-          className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+      <div className="container mx-auto px-4 py-8">
+        <motion.h1
+          className="text-4xl font-bold mb-8 text-white text-center"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
-            <h2 className="text-xl font-bold text-white">Select Sign to Validate</h2>
-          </div>
+          Sign Validator
+        </motion.h1>
 
-          <div className="p-6">
-            <form onSubmit={handleSignSelection} className="mb-6">
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="sign-select" className="block text-sm font-medium text-gray-700 mb-1">
-                    Choose a sign or type your own:
-                  </label>
-                  <input
-                    ref={inputRef}
-                    list="signs-list"
-                    id="sign-select"
-                    type="text"
-                    placeholder="Enter or select a sign..."
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    required
-                  />
-                  {/* <datalist id="signs-list">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Section: Select Sign */}
+          <motion.div
+            className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+              <h2 className="text-xl font-bold text-white">Select Sign to Validate</h2>
+            </div>
+
+            <div className="p-6">
+              <form onSubmit={handleSignSelection} className="mb-6">
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="sign-select" className="block text-sm font-medium text-gray-700 mb-1">
+                      Choose a sign or type your own:
+                    </label>
+                    <input
+                      ref={inputRef}
+                      list="signs-list"
+                      id="sign-select"
+                      type="text"
+                      placeholder="Enter or select a sign..."
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      required
+                    />
+                    {/* <datalist id="signs-list">
                     {availableSigns.map((sign) => (
                       <option key={sign} value={sign} />
                     ))}
                   </datalist> */}
-                </div>
+                  </div>
 
-                <motion.button
-                  type="submit"
-                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Select Sign
+                  <motion.button
+                    type="submit"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Select Sign
+                  </motion.button>
+                </div>
+              </form>
+
+              <hr className="border-gray-200 my-6" />
+
+              {selectedSign ? (
+                <div className="flex flex-col items-center">
+                  <h2 className="text-2xl font-semibold mb-4 text-black">Reference Sign Video: {selectedSign}</h2>
+
+                  {videoError ? (
+                    <div className="w-full aspect-video bg-gray-100 rounded-xl flex flex-col items-center justify-center p-4 text-center">
+                      <Info className="w-12 h-12 text-yellow-500 mb-2" />
+                      <h3 className="text-lg font-bold mb-1">Video Not Available</h3>
+                      <p className="text-sm text-gray-500">
+                        The sign video for "{selectedSign}" could not be found in your library.
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">Try one of the available signs from the dropdown list.</p>
+                    </div>
+                  ) : (
+                    <div className="w-full max-w-md">
+                      <video
+                        ref={videoRef}
+                        className="w-full rounded-lg border-2 border-gray-200 shadow-md"
+                        autoPlay
+                        loop
+                        controls
+                        muted
+                        onError={handleVideoError}
+                      >
+                        <source src={referenceVideo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gray-100 rounded-xl p-8 text-center">
+                  <p className="text-gray-500">Select a sign to see the reference video</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Right Section: Camera Validation */}
+          <motion.div className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
+              <h2 className="text-xl font-bold text-white">Validate Your Sign</h2>
+            </div>
+            <div className="p-6">
+              <div className="flex justify-center mb-6">
+                <motion.button className={`py-3 px-6 rounded-lg font-medium transition-all flex items-center gap-2 ${cameraActive ? "bg-red-500 hover:bg-red-600 text-white" : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"}`} onClick={handleToggleCamera} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={!selectedSign}>
+                  <Camera className="w-5 h-5" />
+                  {cameraActive ? "Stop Validation" : "Start Validation"}
                 </motion.button>
               </div>
-            </form>
-
-            <hr className="border-gray-200 my-6" />
-
-            {selectedSign ? (
+              <hr className="border-gray-200 my-6" />
               <div className="flex flex-col items-center">
-                <h2 className="text-2xl font-semibold mb-4 text-black">Reference Sign Video: {selectedSign}</h2>
-
-                {videoError ? (
-                  <div className="w-full aspect-video bg-gray-100 rounded-xl flex flex-col items-center justify-center p-4 text-center">
-                    <Info className="w-12 h-12 text-yellow-500 mb-2" />
-                    <h3 className="text-lg font-bold mb-1">Video Not Available</h3>
-                    <p className="text-sm text-gray-500">
-                      The sign video for "{selectedSign}" could not be found in your library.
-                    </p>
-                    <p className="text-xs text-gray-400 mt-2">Try one of the available signs from the dropdown list.</p>
+                <div className="relative w-full aspect-video bg-black/10 rounded-xl overflow-hidden shadow-lg">
+                  <div className="relative w-full h-full">
+                    <video ref={cameraVideoRef} className="w-full h-full object-cover absolute top-0 left-0" autoPlay playsInline muted />
+                    <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
                   </div>
-                ) : (
-                  <div className="w-full max-w-md">
-                    <video
-                      ref={videoRef}
-                      className="w-full rounded-lg border-2 border-gray-200 shadow-md"
-                      autoPlay
-                      loop
-                      controls
-                      onError={handleVideoError}
-                    >
-                      <source src={referenceVideo} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-gray-100 rounded-xl p-8 text-center">
-                <p className="text-gray-500">Select a sign to see the reference video</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Right Section: Camera Validation */}
-        <motion.div className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
-            <h2 className="text-xl font-bold text-white">Validate Your Sign</h2>
-          </div>
-          <div className="p-6">
-            <div className="flex justify-center mb-6">
-              <motion.button className={`py-3 px-6 rounded-lg font-medium transition-all flex items-center gap-2 ${cameraActive ? "bg-red-500 hover:bg-red-600 text-white" : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"}`} onClick={handleToggleCamera} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={!selectedSign}>
-                <Camera className="w-5 h-5" />
-                {cameraActive ? "Stop Validation" : "Start Validation"}
-              </motion.button>
-            </div>
-            <hr className="border-gray-200 my-6" />
-            <div className="flex flex-col items-center">
-              <div className="relative w-full aspect-video bg-black/10 rounded-xl overflow-hidden shadow-lg">
-                <div className="relative w-full h-full">
-                  <video ref={cameraVideoRef} className="w-full h-full object-cover absolute top-0 left-0" autoPlay playsInline muted />
-                  <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
                 </div>
+                <motion.div className="mt-6 text-xl font-semibold" animate={{ scale: validationResult !== null ? [1, 1.1, 1] : 1, transition: { duration: 0.5 } }}>
+                  {validationResult === null ? (
+                    <span className="text-black">Waiting for detection...</span>
+                  ) : validationResult ? (
+                    <span className="text-green-500 flex items-center gap-2">
+                      <Check className="w-5 h-5" /> Correct! "{lastDetectedSign}" matches "{selectedSign}"
+                    </span>
+                  ) : (
+                    <span className="text-red-500">
+                      Incorrect. Detected "{lastDetectedSign}", expected "{selectedSign}"
+                    </span>
+                  )}
+                </motion.div>
               </div>
-              <motion.div className="mt-6 text-xl font-semibold" animate={{ scale: validationResult !== null ? [1, 1.1, 1] : 1, transition: { duration: 0.5 } }}>
-                {validationResult === null ? (
-                  <span className="text-black">Waiting for detection...</span>
-                ) : validationResult ? (
-                  <span className="text-green-500 flex items-center gap-2">
-                    <Check className="w-5 h-5" /> Correct! "{lastDetectedSign}" matches "{selectedSign}"
-                  </span>
-                ) : (
-                  <span className="text-red-500">
-                    Incorrect. Detected "{lastDetectedSign}", expected "{selectedSign}"
-                  </span>
-                )}
-              </motion.div>
             </div>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   )

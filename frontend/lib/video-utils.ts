@@ -203,7 +203,6 @@ export function textToSignVideos(text: string): string[] {
     .map((w) => getSignVideoPath(w))
     .filter((x): x is string => Boolean(x))
 }
- 
 /**
  * Check if a video file exists in the public directory
  */
